@@ -16,6 +16,7 @@ from yacs.config import CfgNode as CN
 
 _C = CN()
 _C.DEVICE = "cuda"
+_C.SEED = 42
 
 # -----------------------------------------------------------------------------
 # MODEL
@@ -57,10 +58,12 @@ _C.DATALOADER.NUM_WORKERS = 8
 _C.SOLVER = CN()
 _C.SOLVER.OPTIMIZER_NAME = "SGD"
 
-_C.SOLVER.MAX_EPOCHS = 50
+_C.SOLVER.MAX_EPOCHS = 20
 
 _C.SOLVER.BASE_LR = 0.001
 _C.SOLVER.BIAS_LR_FACTOR = 2
+
+_C.SOLVER.KL_WEIGHT = 0.00025
 
 _C.SOLVER.MOMENTUM = 0.9
 
@@ -88,7 +91,12 @@ _C.TEST = CN()
 _C.TEST.IMS_PER_BATCH = 8
 _C.TEST.WEIGHT = ""
 
-# ---------------------------------------------------------------------------- #
-# Misc options
-# ---------------------------------------------------------------------------- #
-_C.OUTPUT_DIR = ""
+# -----------------------------------------------------------------------------
+# LOG
+# -----------------------------------------------------------------------------
+_C.LOG = CN()
+_C.LOG.DIR = "./log"
+_C.LOG.ITER_INTERVAL = 1
+_C.LOG.EPOCH_INTERVAL = 10
+_C.LOG.OUTPUT_TO_FILE = True # 是否输出到文件，默认输出到控制台
+_C.LOG.PREFIX = "default" # 输出到文件的命名前缀

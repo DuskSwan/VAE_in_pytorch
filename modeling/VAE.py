@@ -46,7 +46,7 @@ class picVAE(nn.Module):
 
         # encoder
         modules = [encoder_block(3, hiddens[0])] # 3 channels for RGB to start
-        cur_length = img_length
+        cur_length = img_length // 2
         for in_channel, out_channel in pairwise(hiddens):
             modules.append(encoder_block(in_channel, out_channel))
             cur_length = cur_length // 2
@@ -62,15 +62,17 @@ class picVAE(nn.Module):
 
         # change vector to image
         self.decoder_projection = nn.Linear(latent_dim, 
-                                            hiddens[-1] * img_length * img_length)
-        self.decoder_input_chw = (hiddens[-1], img_length, img_length)
+                                            hiddens[-1] * cur_length * cur_length)
+        self.decoder_input_chw = (hiddens[-1], cur_length, cur_length)
         # decoder
         modules = []
         for in_channel, out_channel in pairwise(hiddens[::-1]):
             modules.append( decoder_block(in_channel, out_channel) )
+            cur_length = cur_length * 2
         self.decoder = nn.Sequential(*modules)
 
         # change channel to 3
+        assert cur_length == img_length // 2
         self.final_layer = nn.Sequential(
             nn.ConvTranspose2d(hiddens[0],
                                 hiddens[0],
@@ -87,7 +89,6 @@ class picVAE(nn.Module):
         x = self.encoder(x)
         x = torch.flatten(x, 1)
         mean = self.mean_linear(x)
-        var = self.var_linear(x)
         eps = torch.randn_like(mean)
         logvar = self.var_linear(x)
         std = torch.exp(logvar / 2)
@@ -98,3 +99,20 @@ class picVAE(nn.Module):
         x = self.final_layer(x)
         return x, mean, logvar
     
+    def sample(self, device='cpu'):
+        z = torch.randn(1, self.latent_dim).to(device)
+        x = self.decoder_projection(z)
+        x = torch.reshape(x, (-1, *self.decoder_input_chw))
+        x = self.decoder(x)
+        x = self.final_layer(x)
+        return x
+    
+if __name__ == '__main__':
+    model = picVAE()
+    x = torch.randn(16, 3, 64, 64)
+    y, mean, logvar = model(x)
+    print('x:', x.shape)
+    print('y:', y.shape)
+    print(mean.shape)
+    print(logvar.shape)
+    print(model.sample().shape)
