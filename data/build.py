@@ -12,6 +12,8 @@ class CelebADataset(Dataset):
     def __init__(self, root, img_shape=(64, 64)) -> None:
         super().__init__()
         self.root = root
+        if type(img_shape) == int:
+            img_shape = (img_shape, img_shape)
         self.img_shape = img_shape
         self.filenames = sorted(os.listdir(root))
 
@@ -38,7 +40,7 @@ def make_data_loader(cfg, is_train=False, **kwargs):
         root = cfg.INFERENCE.DATA_PATH
         batch_size = cfg.INFERENCE.BATCH_SIZE
         shuffle = False
-    dataset = CelebADataset(root, **kwargs)
+    dataset = CelebADataset(root, img_shape=cfg.MODEL.IMG_LENGTH, **kwargs)
     dataloader = DataLoader(dataset, batch_size, shuffle=shuffle, num_workers=cfg.DATALOADER.NUM_WORKERS)
     return dataloader
 

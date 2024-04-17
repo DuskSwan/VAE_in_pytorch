@@ -54,6 +54,7 @@ class picVAE(nn.Module):
         self.encoder = nn.Sequential(*modules)
 
         # calculate mean and variance
+        assert cur_length == img_length // 2**len(hiddens)
         self.mean_linear = nn.Linear(hiddens[-1] * cur_length * cur_length,
                                      latent_dim)
         self.var_linear = nn.Linear(hiddens[-1] * cur_length * cur_length,

@@ -23,7 +23,7 @@ _C.SEED = 42
 # -----------------------------------------------------------------------------
 
 _C.MODEL = CN()
-_C.MODEL.IMG_LENGTH = 64
+_C.MODEL.IMG_LENGTH = 128
 _C.MODEL.HIDDEN_CHNLS = [16, 32, 64, 128, 256]
 _C.MODEL.LATENT_DIM = 128
 
@@ -41,7 +41,7 @@ _C.TRAIN.DATA_PATH = r'data\datasets\CelebA'
 # INFERENCE
 # -----------------------------------------------------------------------------
 _C.INFERENCE = CN()
-_C.INFERENCE.BATCH_SIZE = 1
+_C.INFERENCE.BATCH_SIZE = 4
 _C.INFERENCE.MODEL_PATH = r'output\model.pth'
 _C.INFERENCE.DATA_PATH = r'data\datasets\CelebA'
 
@@ -56,9 +56,9 @@ _C.DATALOADER.NUM_WORKERS = 8
 # Solver
 # ---------------------------------------------------------------------------- #
 _C.SOLVER = CN()
-_C.SOLVER.OPTIMIZER_NAME = "SGD"
+_C.SOLVER.OPTIMIZER_NAME = "Adam"
 
-_C.SOLVER.MAX_EPOCHS = 20
+_C.SOLVER.MAX_EPOCHS = 100
 
 _C.SOLVER.BASE_LR = 0.001
 _C.SOLVER.BIAS_LR_FACTOR = 2

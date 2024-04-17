@@ -59,36 +59,42 @@ def train_without_engine(cfg, dataloader, model):
         print(f'epoch {i}: loss {loss_sum} {minute}:{second}')
         torch.save(model, 'output/VAEmodel.pth')
 
-def reconstruct(cfg, dataloader, model):
+def reconstruct(cfg, dataloader, model, n=1):
     device = cfg.DEVICE
     model.eval()
     batch = next(iter(dataloader))
-    x = batch[0:1, ...].to(device)
-    output = model(x)[0]
-    output = output[0].detach().cpu()
-    input = batch[0].detach().cpu()
-    combined = torch.cat((output, input), 1)
-    img = ToPILImage()(combined)
-    img.save('output/reconstruct.jpg')
+    assert n <= batch.size(0)
+    x = batch[0:n, ...].to(device) # n, 3, 64, 64
+    for i in range(n):
+        input = x[i:i+1, ...]
+        output = model(input)[0]
+        output = output[0].detach().cpu()
+        raw = batch[i].detach().cpu()
+        combined = torch.cat((output, raw), 1)
+        img = ToPILImage()(combined)
+        img.save(f'output/reconstruct{i}.jpg')
 
-def generate(cfg, model):
+def generate(cfg, model, n=1):
     device = cfg.DEVICE
     model.eval()
-    output = model.sample(device)
-    output = output[0].detach().cpu()
-    img = ToPILImage()(output)
-    img.save('output/generate.jpg')
+
+    for i in range(n):
+        output = model.sample(device)
+        output = output[0].detach().cpu()
+        img = ToPILImage()(output)
+        img.save(f'output/generate{i}.jpg')
 
 def main():
     set_random_seed(cfg.SEED)
     model = build_model(cfg)
     train_loader = make_data_loader(cfg, is_train=True)
     train_without_engine(cfg, train_loader, model)
+    # model = torch.load('output/VAEmodel.pth')
 
     val_loader = make_data_loader(cfg, is_train=False)
-    reconstruct(cfg, val_loader, model)
+    reconstruct(cfg, val_loader, model, 4)
 
-    generate(cfg, model)
+    generate(cfg, model, 4)
 
 
 if __name__ == '__main__':
