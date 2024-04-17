@@ -29,14 +29,24 @@ class CelebADataset(Dataset):
         return pipeline(img)
 
 
-def make_data_loader(root='data/datasets/celebA', **kwargs):
+def make_data_loader(cfg, is_train=False, **kwargs):
+    if(is_train):
+        root = cfg.TRAIN.DATA_PATH
+        batch_size = cfg.TRAIN.BATCH_SIZE
+        shuffle = True
+    else:
+        root = cfg.INFERENCE.DATA_PATH
+        batch_size = cfg.INFERENCE.BATCH_SIZE
+        shuffle = False
     dataset = CelebADataset(root, **kwargs)
-    return DataLoader(dataset, 16, shuffle=True)
+    dataloader = DataLoader(dataset, batch_size, shuffle=shuffle, num_workers=cfg.DATALOADER.NUM_WORKERS)
+    return dataloader
 
 if __name__ == '__main__':
-    import torchvision
-    print(torchvision.__version__)
-    dataloader = make_data_loader()
+    import sys
+    sys.path.append('.')
+    from config import cfg
+    dataloader = make_data_loader(cfg, is_train=True)
     img = next(iter(dataloader))
     print(img.shape)
     # Concat 4x4 images

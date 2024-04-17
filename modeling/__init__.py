@@ -1,8 +1,10 @@
 # encoding: utf-8
 
-from .example_model import ResNet18
+from .VAE import picVAE
 
 
 def build_model(cfg):
-    model = ResNet18(cfg.MODEL.NUM_CLASSES)
+    model = picVAE(hiddens = cfg.MODEL.HIDDEN_CHNLS, 
+                   img_length = cfg.MODEL.IMG_LENGTH, 
+                   latent_dim = cfg.MODEL.LATENT_DIM)
     return model

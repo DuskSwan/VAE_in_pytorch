@@ -15,38 +15,34 @@ from yacs.config import CfgNode as CN
 # -----------------------------------------------------------------------------
 
 _C = CN()
+_C.DEVICE = "cuda"
+
+# -----------------------------------------------------------------------------
+# MODEL
+# -----------------------------------------------------------------------------
 
 _C.MODEL = CN()
-_C.MODEL.DEVICE = "cuda"
-_C.MODEL.NUM_CLASSES = 10
+_C.MODEL.IMG_LENGTH = 64
+_C.MODEL.HIDDEN_CHNLS = [16, 32, 64, 128, 256]
+_C.MODEL.LATENT_DIM = 128
 
 # -----------------------------------------------------------------------------
-# INPUT
+# TRAIN
 # -----------------------------------------------------------------------------
-_C.INPUT = CN()
-# Size of the image during training
-_C.INPUT.SIZE_TRAIN = 32
-# Size of the image during test
-_C.INPUT.SIZE_TEST = 32
-# Minimum scale for the image during training
-_C.INPUT.MIN_SCALE_TRAIN = 0.5
-# Maximum scale for the image during test
-_C.INPUT.MAX_SCALE_TRAIN = 1.2
-# Random probability for image horizontal flip
-_C.INPUT.PROB = 0.5
-# Values to be used for image normalization
-_C.INPUT.PIXEL_MEAN = [0.1307, ]
-# Values to be used for image normalization
-_C.INPUT.PIXEL_STD = [0.3081, ]
+
+_C.TRAIN = CN()
+_C.TRAIN.BATCH_SIZE = 16
+_C.TRAIN.CHECKPOINT_PERIOD = 10
+_C.TRAIN.NEED_CHRCKPOINT = False
+_C.TRAIN.DATA_PATH = r'data\datasets\CelebA'
 
 # -----------------------------------------------------------------------------
-# Dataset
+# INFERENCE
 # -----------------------------------------------------------------------------
-_C.DATASETS = CN()
-# List of the dataset names for training, as present in paths_catalog.py
-_C.DATASETS.TRAIN = ()
-# List of the dataset names for testing, as present in paths_catalog.py
-_C.DATASETS.TEST = ()
+_C.INFERENCE = CN()
+_C.INFERENCE.BATCH_SIZE = 1
+_C.INFERENCE.MODEL_PATH = r'output\model.pth'
+_C.INFERENCE.DATA_PATH = r'data\datasets\CelebA'
 
 # -----------------------------------------------------------------------------
 # DataLoader
